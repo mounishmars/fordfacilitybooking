@@ -79,14 +79,12 @@ Then re-run `npm run api:seed`.
 
 Do **not** push directly to `main`. Use a feature branch + PR.
 
-**Preferred CI:** Google Cloud Build (`cloudbuild.yaml`) — same pattern as office GCP.  
-**Optional:** GitHub Actions (`.github/workflows/ci.yml`) until GCP is connected.
+**CI (default):** GitHub Actions (`.github/workflows/ci.yml`) — free for this repo, no GCP billing.  
+**Optional later:** Google Cloud Build (`cloudbuild.yaml`) if you get a Ford/GCP sandbox.
 
-Cycode / FOSSA / Sonar run **as steps inside** Cloud Build (or Actions). They are not GCloud products.
+Cycode / FOSSA / Sonar run as CI steps (not GCloud products).
 
-Setup guides:
-- [docs/GCLOUD_CI_SETUP.md](docs/GCLOUD_CI_SETUP.md) — create GCP project through Cloud Build + Cycode/FOSSA/Sonar
-- [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) — overview / branching
+Setup: [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) · GCloud (optional): [docs/GCLOUD_CI_SETUP.md](docs/GCLOUD_CI_SETUP.md)
 
 ```bash
 git checkout -b feature/my-change
