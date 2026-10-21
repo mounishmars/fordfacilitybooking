@@ -1,0 +1,112 @@
+# Google Cloud Build — preferred CI for Ford-style pipelines
+# Connect the GitHub repo as a Cloud Build trigger (PR + push to main).
+#
+# Substitutions (configure on the trigger):
+#   _ENABLE_CYCODE / _ENABLE_FOSSA / _ENABLE_SONAR = true|false
+#   _SONAR_HOST_URL = "" for SonarCloud, or your SonarQube Server URL
+#
+# Before enabling scans, create Secret Manager secrets (see docs/CI_CD_SETUP.md).
+# Build-only works without secrets — use cloudbuild.build-only.yaml if secrets
+# are not created yet.
+
+substitutions:
+  _ENABLE_CYCODE: "false"
+  _ENABLE_FOSSA: "false"
+  _ENABLE_SONAR: "false"
+  _SONAR_HOST_URL: "https://sonarcloud.io"
+  _NODE_VERSION: "20"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - id: npm-ci
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["ci"]
+
+  - id: build-shared
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["run", "build", "-w", "@ford/shared"]
+    waitFor: ["npm-ci"]
+
+  - id: build-api
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["run", "build", "-w", "@ford/api"]
+    waitFor: ["build-shared"]
+
+  - id: build-admin
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["run", "build", "-w", "@ford/admin"]
+    waitFor: ["build-shared"]
+
+  - id: cycode-scan
+    name: python:3.12-slim
+    entrypoint: bash
+    secretEnv: ["CYCODE_CLIENT_ID", "CYCODE_CLIENT_SECRET"]
+    waitFor: ["build-api", "build-admin"]
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        if [ "${_ENABLE_CYCODE}" != "true" ]; then
+          echo "Cycode skipped (_ENABLE_CYCODE=${_ENABLE_CYCODE})"
+          exit 0
+        fi
+        pip install --quiet cycode
+        cycode scan --severity-threshold HIGH -t sast path ./
+        cycode scan --severity-threshold HIGH -t sca path ./
+        cycode scan --severity-threshold HIGH -t secret path ./
+
+  - id: fossa-scan
+    name: node:${_NODE_VERSION}
+    entrypoint: bash
+    secretEnv: ["FOSSA_API_KEY"]
+    waitFor: ["npm-ci"]
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        if [ "${_ENABLE_FOSSA}" != "true" ]; then
+          echo "FOSSA skipped (_ENABLE_FOSSA=${_ENABLE_FOSSA})"
+          exit 0
+        fi
+        curl -fsSL https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
+        export PATH="$$PATH:/usr/local/bin:$$HOME/.local/bin"
+        fossa analyze
+        fossa test
+
+  - id: sonar-scan
+    name: sonarsource/sonar-scanner-cli:11
+    entrypoint: /bin/bash
+    secretEnv: ["SONAR_TOKEN"]
+    waitFor: ["build-api", "build-admin"]
+    env:
+      - "SONAR_HOST_URL=${_SONAR_HOST_URL}"
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        if [ "${_ENABLE_SONAR}" != "true" ]; then
+          echo "Sonar skipped (_ENABLE_SONAR=${_ENABLE_SONAR})"
+          exit 0
+        fi
+        export SONAR_TOKEN
+        export SONAR_HOST_URL
+        sonar-scanner
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/CYCODE_CLIENT_ID/versions/latest
+      env: CYCODE_CLIENT_ID
+    - versionName: projects/$PROJECT_ID/secrets/CYCODE_CLIENT_SECRET/versions/latest
+      env: CYCODE_CLIENT_SECRET
+    - versionName: projects/$PROJECT_ID/secrets/FOSSA_API_KEY/versions/latest
+      env: FOSSA_API_KEY
+    - versionName: projects/$PROJECT_ID/secrets/SONAR_TOKEN/versions/latest
+      env: SONAR_TOKEN
+
+timeout: 1800s

@@ -79,13 +79,19 @@ Then re-run `npm run api:seed`.
 
 Do **not** push directly to `main`. Use a feature branch + PR.
 
-- Workflow: `.github/workflows/ci.yml` (Build always; Cycode / FOSSA / Sonar when enabled)
-- Full setup guide (secrets, SonarCloud vs SonarQube, branch protection): [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md)
+**Preferred CI:** Google Cloud Build (`cloudbuild.yaml`) — same pattern as office GCP.  
+**Optional:** GitHub Actions (`.github/workflows/ci.yml`) until GCP is connected.
+
+Cycode / FOSSA / Sonar run **as steps inside** Cloud Build (or Actions). They are not GCloud products.
+
+Full setup: [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md)
 
 ```bash
 git checkout -b feature/my-change
 git push -u origin HEAD
 gh pr create --base main
+# Local GCP smoke test:
+# gcloud builds submit --config=cloudbuild.build-only.yaml
 ```
 
 ## Swagger & Hoppscotch
