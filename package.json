@@ -1,0 +1,15 @@
+{
+  "name": "ford-facility-booking",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "api": "npm run start:dev -w @ford/api",
+    "api:seed": "npm run seed -w @ford/api",
+    "admin": "npm run dev -w @ford/admin",
+    "mobile": "npm run start -w @ford/mobile",
+    "build": "npm run build -w @ford/api && npm run build -w @ford/admin"
+  }
+}

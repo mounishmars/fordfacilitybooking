@@ -1,0 +1,209 @@
+:root {
+  --bg: #0f1720;
+  --surface: #1a2430;
+  --surface-2: #243041;
+  --text: #f3f6f9;
+  --muted: #9aabbc;
+  --accent: #066fe3;
+  --accent-soft: #1a4f8c;
+  --success: #1f8a4c;
+  --danger: #c23b3b;
+  --warning: #c9891a;
+  --border: #2e3d4f;
+  --radius: 10px;
+  --font: "Ford Antenna", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse at top left, #1a3555 0%, transparent 45%),
+    radial-gradient(ellipse at bottom right, #0d2a1f 0%, transparent 40%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.card {
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.btn {
+  appearance: none;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.secondary {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.btn.danger {
+  background: var(--danger);
+}
+
+.btn.success {
+  background: var(--success);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.badge.PENDING {
+  background: color-mix(in srgb, var(--warning) 30%, transparent);
+  color: #ffd789;
+}
+
+.badge.CONFIRMED {
+  background: color-mix(in srgb, var(--success) 30%, transparent);
+  color: #8dffb5;
+}
+
+.badge.REJECTED,
+.badge.CANCELLED {
+  background: color-mix(in srgb, var(--danger) 30%, transparent);
+  color: #ffb0b0;
+}
+
+.badge.BLOCKED {
+  background: color-mix(in srgb, var(--danger) 25%, transparent);
+  color: #ffc0c0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.table th {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.nav a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.nav a.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: #ffb0b0;
+  margin-top: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.brand span {
+  color: #7eb6ff;
+}

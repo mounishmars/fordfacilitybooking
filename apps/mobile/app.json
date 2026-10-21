@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Ford Facility Booking",
+    "slug": "ford-facility-booking",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "fordfacility",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ford.facilitybooking"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#066FE3"
+      },
+      "package": "com.ford.facilitybooking"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
