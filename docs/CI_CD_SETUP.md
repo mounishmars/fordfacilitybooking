@@ -1,5 +1,8 @@
 # CI/CD setup — prefer Google Cloud Build (+ Cycode / Sonar / FOSSA)
 
+**Full walkthrough (create project → trigger → secrets → scans):**  
+[GCLOUD_CI_SETUP.md](./GCLOUD_CI_SETUP.md)
+
 ## Recommendation
 
 | Option | Use when |

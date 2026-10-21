@@ -84,7 +84,9 @@ Do **not** push directly to `main`. Use a feature branch + PR.
 
 Cycode / FOSSA / Sonar run **as steps inside** Cloud Build (or Actions). They are not GCloud products.
 
-Full setup: [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md)
+Setup guides:
+- [docs/GCLOUD_CI_SETUP.md](docs/GCLOUD_CI_SETUP.md) — create GCP project through Cloud Build + Cycode/FOSSA/Sonar
+- [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) — overview / branching
 
 ```bash
 git checkout -b feature/my-change
