@@ -75,6 +75,25 @@ DATABASE_URL=postgres://ford:ford@localhost:5432/facility_booking
 
 Then re-run `npm run api:seed`.
 
+## Branching & CI/CD
+
+Do **not** push directly to `main`. Use a feature branch + PR.
+
+**CI (default):** GitHub Actions (`.github/workflows/ci.yml`) — free for this repo, no GCP billing.  
+**Optional later:** Google Cloud Build (`cloudbuild.yaml`) if you get a Ford/GCP sandbox.
+
+Cycode / FOSSA / Sonar run as CI steps (not GCloud products).
+
+Setup: [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) · GCloud (optional): [docs/GCLOUD_CI_SETUP.md](docs/GCLOUD_CI_SETUP.md)
+
+```bash
+git checkout -b feature/my-change
+git push -u origin HEAD
+gh pr create --base main
+# Local GCP smoke test:
+# gcloud builds submit --config=cloudbuild.build-only.yaml
+```
+
 ## Swagger & Hoppscotch
 
 With the API running (`npm run api`):

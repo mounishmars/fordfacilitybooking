@@ -1,0 +1,34 @@
+# Use this until Secret Manager secrets exist for Cycode/FOSSA/Sonar.
+# gcloud builds submit --config=cloudbuild.build-only.yaml
+
+substitutions:
+  _NODE_VERSION: "20"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - id: npm-ci
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["ci"]
+
+  - id: build-shared
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["run", "build", "-w", "@ford/shared"]
+    waitFor: ["npm-ci"]
+
+  - id: build-api
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["run", "build", "-w", "@ford/api"]
+    waitFor: ["build-shared"]
+
+  - id: build-admin
+    name: node:${_NODE_VERSION}
+    entrypoint: npm
+    args: ["run", "build", "-w", "@ford/admin"]
+    waitFor: ["build-shared"]
+
+timeout: 1200s

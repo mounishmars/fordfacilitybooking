@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared package
+        run: npm run build -w @ford/shared
+
+      - name: Build API
+        run: npm run build -w @ford/api
+
+      - name: Build Admin
+        run: npm run build -w @ford/admin
+
+  cycode:
+    name: Cycode scan
+    runs-on: ubuntu-latest
+    # Turn on after adding CYCODE_CLIENT_ID / CYCODE_CLIENT_SECRET
+    # Settings → Secrets → Actions, then Variables → ENABLE_CYCODE=true
+    if: ${{ vars.ENABLE_CYCODE == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Cycode CLI
+        run: pip install cycode
+
+      - name: Cycode SAST
+        env:
+          CYCODE_CLIENT_ID: ${{ secrets.CYCODE_CLIENT_ID }}
+          CYCODE_CLIENT_SECRET: ${{ secrets.CYCODE_CLIENT_SECRET }}
+        run: cycode scan --severity-threshold HIGH -t sast path ./
+
+      - name: Cycode SCA
+        env:
+          CYCODE_CLIENT_ID: ${{ secrets.CYCODE_CLIENT_ID }}
+          CYCODE_CLIENT_SECRET: ${{ secrets.CYCODE_CLIENT_SECRET }}
+        run: cycode scan --severity-threshold HIGH -t sca path ./
+
+      - name: Cycode secrets
+        env:
+          CYCODE_CLIENT_ID: ${{ secrets.CYCODE_CLIENT_ID }}
+          CYCODE_CLIENT_SECRET: ${{ secrets.CYCODE_CLIENT_SECRET }}
+        run: cycode scan --severity-threshold HIGH -t secret path ./
+
+  fossa:
+    name: FOSSA license scan
+    runs-on: ubuntu-latest
+    # Turn on after adding FOSSA_API_KEY and ENABLE_FOSSA=true
+    if: ${{ vars.ENABLE_FOSSA == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: FOSSA analyze + policy gate
+        uses: fossas/fossa-action@v1.7.0
+        with:
+          api-key: ${{ secrets.FOSSA_API_KEY }}
+          run-tests: true
+
+  sonar:
+    name: SonarQube / SonarCloud
+    runs-on: ubuntu-latest
+    # Turn on after adding SONAR_TOKEN (+ optional SONAR_HOST_URL) and ENABLE_SONAR=true
+    if: ${{ vars.ENABLE_SONAR == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared (for analysis context)
+        run: npm run build -w @ford/shared
+
+      - name: Sonar scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # SonarCloud: omit SONAR_HOST_URL (uses https://sonarcloud.io)
+          # SonarQube Server: set secret SONAR_HOST_URL to your server URL
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
