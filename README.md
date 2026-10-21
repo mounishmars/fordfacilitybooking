@@ -75,6 +75,19 @@ DATABASE_URL=postgres://ford:ford@localhost:5432/facility_booking
 
 Then re-run `npm run api:seed`.
 
+## Branching & CI/CD
+
+Do **not** push directly to `main`. Use a feature branch + PR.
+
+- Workflow: `.github/workflows/ci.yml` (Build always; Cycode / FOSSA / Sonar when enabled)
+- Full setup guide (secrets, SonarCloud vs SonarQube, branch protection): [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md)
+
+```bash
+git checkout -b feature/my-change
+git push -u origin HEAD
+gh pr create --base main
+```
+
 ## Swagger & Hoppscotch
 
 With the API running (`npm run api`):
