@@ -24,10 +24,11 @@ export class TimeSlot {
   @Column()
   facilityId: string;
 
-  @Column({ type: 'datetime' })
+  // Use timestamp (Postgres + SQLite); "datetime" is SQLite-only and breaks Neon/Postgres
+  @Column({ type: 'timestamp' })
   startAt: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   endAt: Date;
 
   @Column({ type: 'varchar', default: SlotStatus.OPEN })
